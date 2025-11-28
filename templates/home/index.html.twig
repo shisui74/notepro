@@ -1,10 +1,136 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bienvenue sur NotePro!{% endblock %}
+{% block title %}Accueil - NotePro{% endblock %}
 
 {% block body %}
-    {% for success in app.flashes('success') %}
-        {{ success }}
-    {% endfor %}
+    {# Gestion des messages flash (Succès, Erreurs) #}
+    <div class="container mt-3">
+        {% for success in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                {{ success }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
 
+    <div class="container py-4">
+        {# Section Héro (En-tête principal) #}
+        <div class="p-5 mb-4 bg-light rounded-3 shadow-sm border">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold text-primary">Bienvenue sur NotePro</h1>
+                <p class="col-md-8 fs-4 text-muted">
+                    La plateforme de gestion de vie scolaire du Lycée Faure.
+                    Simple, rapide et efficace pour le suivi pédagogique.
+                </p>
+
+                {% if not app.user %}
+                    <hr class="my-4">
+                    <p>Connectez-vous pour accéder à votre espace personnel.</p>
+                    <a class="btn btn-primary btn-lg px-4 gap-3" href="{{ path('app_login') }}" role="button">
+                        Se connecter
+                    </a>
+                {% else %}
+                    <p class="fs-5 mt-3">
+                        Bonjour, <span class="fw-bold text-dark">{{ app.user.name }}</span> !
+                        <br>
+                        <span class="badge bg-secondary text-uppercase" style="font-size: 0.8rem;">
+                            {% if 'ROLE_PROFESSOR' in app.user.roles %}
+                                Professeur
+                            {% elseif 'ROLE_STUDENT' in app.user.roles %}
+                                Étudiant
+                            {% else %}
+                                Utilisateur
+                            {% endif %}
+                        </span>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Section Tableau de Bord (Selon le rôle) #}
+        <div class="row align-items-md-stretch">
+
+            {% if is_granted('ROLE_STUDENT') %}
+                {# --- VUE ÉTUDIANT --- #}
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-5 text-white bg-primary rounded-3 shadow hover-zoom">
+                        <h2 class="mb-3">📊 Mes Résultats</h2>
+                        <p>Consultez vos dernières notes, visualisez vos moyennes par matière et suivez votre progression scolaire en temps réel.</p>
+                        <a href="{{ path('app_student_notes', {id: app.user.id}) }}" class="btn btn-outline-light mt-2" type="button">
+                            Voir mes notes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-5 bg-white border rounded-3 shadow-sm">
+                        <h2 class="mb-3">👤 Mon Profil</h2>
+                        <p>Gérez vos informations personnelles et sécurisez votre compte en modifiant votre mot de passe régulièrement.</p>
+                        <a href="{{ path('user_change_password') }}" class="btn btn-outline-secondary mt-2" type="button">
+                            Paramètres du compte
+                        </a>
+                    </div>
+                </div>
+
+            {% elseif is_granted('ROLE_PROFESSOR') %}
+                {# --- VUE PROFESSEUR --- #}
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-5 text-white bg-success rounded-3 shadow">
+                        <h2 class="mb-3">🏫 Mes Classes</h2>
+                        <p>Accédez à la liste de vos classes, consultez les trombinoscopes et gérez vos groupes d'étudiants.</p>
+                        <a href="{{ path('app_professor_classes', {id: app.user.id}) }}" class="btn btn-outline-light mt-2" type="button">
+                            Gérer les classes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-5 bg-white border rounded-3 shadow-sm">
+                        <h2 class="mb-3">📝 Évaluations</h2>
+                        <p>Créez de nouveaux devoirs, saisissez les notes des élèves et planifiez les dates de publication des résultats.</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="{{ path('app_professor_evaluations', {id: app.user.id}) }}" class="btn btn-outline-primary mt-2" type="button">
+                                Liste des évals
+                            </a>
+                            <a href="{{ path('app_evaluation_new') }}" class="btn btn-primary mt-2" type="button">
+                                + Créer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            {% elseif not app.user %}
+                {# --- VUE INVITÉ (Non connecté) --- #}
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">⚡</div>
+                            <h5 class="card-title fw-bold">Rapide</h5>
+                            <p class="card-text text-muted">Accès instantané aux résultats dès leur publication par les enseignants.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">🔒</div>
+                            <h5 class="card-title fw-bold">Sécurisé</h5>
+                            <p class="card-text text-muted">Vos données personnelles et scolaires sont protégées et confidentielles.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">📱</div>
+                            <h5 class="card-title fw-bold">Accessible</h5>
+                            <p class="card-text text-muted">Consultez vos notes depuis n'importe quel ordinateur ou tablette.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <footer class="pt-3 mt-4 text-muted border-top text-center">
+            &copy; {{ "now"|date("Y") }} NotePro - Lycée Faure
+        </footer>
+    </div>
 {% endblock %}
