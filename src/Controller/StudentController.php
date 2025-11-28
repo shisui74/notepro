@@ -106,9 +106,12 @@ class StudentController extends AbstractController
     public function notes(Student $student, EntityManagerInterface $entityManager): Response
     {
 
+        $notesTriees = $student->getAverageBySubject();
+
         return $this->render('student/mygrades.html.twig', [
             'student' => $student,
-            'grades' => $student->getGrades()
+            'grades' => $student->getGrades(),
+            'notesParMatiere' => $notesTriees,
 
         ]);
     }

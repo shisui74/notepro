@@ -31,6 +31,11 @@ class EvaluationType extends AbstractType
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
             ])
+            ->add('dateAffichage', DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date de publication des notes',
+                'required' => false,
+            ])
             ->add('label', TextType::class, [
                 'label' => 'Titre de l\'évaluation'
             ])

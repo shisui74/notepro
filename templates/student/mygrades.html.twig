@@ -1,27 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Student{% endblock %}
+{% block title %}Mes Notes - NotePro{% endblock %}
 
 {% block body %}
-    <h1>Notes de {{ app.user.name }}</h1>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">Notes de {{ student.name }}</h1>
+            <span class="text-muted">Année scolaire 2024-2025</span>
+        </div>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Evaluation</th>
-            <th scope="col">Note</th>
-            <th scope="col">Barème</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for gr in student.grades %}
-        <tr>
-            <td>{{ gr.evaluation.label }}</td>
-            <td>{{ gr.grade }}</td>
-            <td>{{ gr.evaluation.bareme }}</td>
-        </tr>
+        {% for matiere, data in notesParMatiere %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary">
+                        <i class="bi bi-book me-2"></i>{{ matiere }}
+                    </h5>
+                    {% if data.moyenne is not null %}
+                        <span class="badge bg-primary fs-6 rounded-pill">
+                        Moyenne : {{ data.moyenne }}/20
+                    </span>
+                    {% else %}
+                        <span class="badge bg-secondary fs-6 rounded-pill">
+                        Pas de moyenne
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 60%;">Devoir</th>
+                                <th scope="col" style="width: 20%;" class="text-center">Note</th>
+                                <th scope="col" style="width: 20%;" class="text-end">Barème</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for grade in data.notes %}
+                                <tr>
+                                    <td>{{ grade.evaluation.label }}</td>
+                                    <td class="text-center fw-bold">
+                                        {% if grade.present %}
+                                            {% if grade.grade < 10 %}
+                                                <span class="text-danger">{{ grade.grade }}</span>
+                                            {% else %}
+                                                <span class="text-success">{{ grade.grade }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-danger">ABSENT</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end text-muted">/ {{ grade.evaluation.bareme }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-end" style="font-size: 0.8rem;">
+                    Total points : {{ data.total_points }} / {{ data.total_bareme }}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info-circle-fill me-2" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                </svg>
+                <div>
+                    Aucune note n'est disponible pour le moment.
+                </div>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
-
+    </div>
 {% endblock %}

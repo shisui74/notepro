@@ -19,6 +19,9 @@ class Evaluation
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateAffichage = null;
+
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
@@ -150,6 +153,28 @@ class Evaluation
         }
 
         return $this;
+    }
+
+    public function getDateAffichage(): ?\DateTimeInterface
+    {
+        return $this->dateAffichage;
+    }
+
+    public function setDateAffichage(?\DateTimeInterface $dateAffichage): static
+    {
+        $this->dateAffichage = $dateAffichage;
+        return $this;
+    }
+
+
+    public function estPubliee(): bool
+    {
+
+        if ($this->dateAffichage === null) {
+            return false;
+        }
+
+        return $this->dateAffichage <= new \DateTime();
     }
 
     public function getGradeByStudent(Student $student): ?Grade
